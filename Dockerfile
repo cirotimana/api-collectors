@@ -17,7 +17,7 @@ ENV NODE_ENV=production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY .env.production .env
+COPY .env.production .env.production
 
 EXPOSE 3040
 

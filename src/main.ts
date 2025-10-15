@@ -12,6 +12,7 @@ async function bootstrap() {
   // CORS
   app.enableCors({
     origin: ['http://localhost:3000', 'http://192.168.21.41:3030'], // Tu frontend
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
 

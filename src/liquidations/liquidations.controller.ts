@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Delete } from '@nestjs/common';
 import { LiquidationsService } from './liquidations.service';
 
 @Controller('liquidations')
@@ -23,5 +23,15 @@ export class LiquidationsController {
   @Get('period/:period')
   findByPeriod(@Param('period') period: string) {
     return this.liquidationsService.findByPeriod(period);
+  }
+
+  @Get('collector/:collectorName')
+  findByCollector(@Param('collectorName') collectorName: string) {
+    return this.liquidationsService.findByCollector(collectorName);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.liquidationsService.remove(+id);
   }
 }
