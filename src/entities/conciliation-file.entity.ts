@@ -23,7 +23,7 @@ export class ConciliationFile {
   createdById: number;
 
   // Relaciones
-  @ManyToOne(() => Conciliation, (conciliation) => conciliation.files)
+  @ManyToOne(() => Conciliation, (conciliation) => conciliation.files, { onDelete: 'CASCADE'})
   @JoinColumn({ name: 'conciliation_id' })
   conciliation: Conciliation;
 

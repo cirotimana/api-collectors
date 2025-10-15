@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException  } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Liquidation } from '../entities/liquidation.entity';
@@ -50,5 +50,24 @@ export class LiquidationsService {
       pending,
       totalAmount: parseFloat(totalAmount.sum) || 0,
     };
+  }
+
+  async findByCollector(collectorName: string) {
+    return await this.liquidationRepository
+      .createQueryBuilder('c')
+      .leftJoinAndSelect('c.collector', 'collector')
+      .leftJoinAndSelect('c.createdBy', 'createdBy')
+      .leftJoinAndSelect('c.files', 'files')
+      .where('LOWER(collector.name) LIKE LOWER(:name)', { name: `%${collectorName}%` })
+      .orderBy('c.createdAt', 'DESC')
+      .getMany();
+  }
+
+  async remove(id: number) {
+    const liquidation = await this.liquidationRepository.findOne({ where: { id } });
+    if (!liquidation) throw new NotFoundException(`Liquidation ${id} no encontrada`);
+
+    await this.liquidationRepository.remove(liquidation);
+    return { message: `Liquidation ${id} eliminada correctamente` };
   }
 }
