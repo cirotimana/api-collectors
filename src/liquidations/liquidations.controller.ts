@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query } from '@nestjs/common';
 import { LiquidationsService } from './liquidations.service';
 
 @Controller('liquidations')
@@ -20,9 +20,10 @@ export class LiquidationsController {
     return this.liquidationsService.findOne(+id);
   }
 
-  @Get('period/:period')
-  findByPeriod(@Param('period') period: string) {
-    return this.liquidationsService.findByPeriod(period);
+  // nuevo endpoint: búsqueda por rango de fechas
+  @Get('range')
+  findByDateRange(@Query('from') from: string, @Query('to') to: string) {
+    return this.liquidationsService.findByDateRange(from, to);
   }
 
   @Get('collector/:collectorName')

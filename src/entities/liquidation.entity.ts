@@ -14,9 +14,12 @@ export class Liquidation {
   @Column({ name: 'liquidations_type', type: 'int' })
   liquidationsType: number;
 
-  @Column({ type: 'text' })
-  period: string;
+  @Column({ name: 'from_date', type: 'date' })
+  fromDate: Date;
 
+  @Column({ name: 'to_date', type: 'date' })
+  toDate: Date;
+  
   @Column({ name: 'amount_collector', type: 'decimal', precision: 10, scale: 2 })
   amountCollector: number;
 

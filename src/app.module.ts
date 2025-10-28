@@ -30,7 +30,7 @@ import { Channel } from './entities/channel.entity';
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
         entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel],
-        synchronize: false, // IMPORTANTE: false en producción
+        synchronize: false, // IMPORTANTE: false en produccion
         logging: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],

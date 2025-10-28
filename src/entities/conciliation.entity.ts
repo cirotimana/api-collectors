@@ -14,8 +14,11 @@ export class Conciliation {
   @Column({ name: 'conciliations_type', type: 'int' })
   conciliationsType: number;
 
-  @Column({ type: 'text' })
-  period: string;
+  @Column({ name: 'from_date', type: 'date' })
+  fromDate: Date;
+
+  @Column({ name: 'to_date', type: 'date' })
+  toDate: Date;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;
