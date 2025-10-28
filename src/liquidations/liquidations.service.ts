@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException  } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { Liquidation } from '../entities/liquidation.entity';
 
 @Injectable()
@@ -24,12 +24,16 @@ export class LiquidationsService {
     });
   }
 
-  async findByPeriod(period: string) {
-    return await this.liquidationRepository.find({
-      where: { period },
-      relations: ['collector', 'createdBy', 'files'],
-      order: { createdAt: 'DESC' },
-    });
+  async findByDateRange(from: string, to: string) {
+  return await this.liquidationRepository
+    .createQueryBuilder('liquidation')
+    .leftJoinAndSelect('liquidation.collector', 'collector')
+    .leftJoinAndSelect('liquidation.createdBy', 'createdBy')
+    .leftJoinAndSelect('liquidation.files', 'files')
+    .where('DATE(liquidation.fromDate) >= DATE(:from)', { from })
+    .andWhere('DATE(liquidation.toDate) <= DATE(:to)', { to })
+    .orderBy('liquidation.fromDate', 'DESC')
+    .getMany();
   }
 
   async getStats() {
@@ -54,12 +58,12 @@ export class LiquidationsService {
 
   async findByCollector(collectorName: string) {
     return await this.liquidationRepository
-      .createQueryBuilder('c')
-      .leftJoinAndSelect('c.collector', 'collector')
-      .leftJoinAndSelect('c.createdBy', 'createdBy')
-      .leftJoinAndSelect('c.files', 'files')
+      .createQueryBuilder('l')
+      .leftJoinAndSelect('l.collector', 'collector')
+      .leftJoinAndSelect('l.createdBy', 'createdBy')
+      .leftJoinAndSelect('l.files', 'files')
       .where('LOWER(collector.name) LIKE LOWER(:name)', { name: `%${collectorName}%` })
-      .orderBy('c.createdAt', 'DESC')
+      .orderBy('l.createdAt', 'DESC')
       .getMany();
   }
 

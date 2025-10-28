@@ -33,7 +33,7 @@ export class Channel {
   })
   deletedAt: Date;
 
-  // Relación con Users
+  // Relacion con Users
   @OneToMany(() => User, (user) => user.channel)
   users: User[];
 }
