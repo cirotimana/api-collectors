@@ -62,7 +62,7 @@ export class ConciliationsService {
   async getStats() {
     const total = await this.conciliationRepository.count();
     const completed = await this.conciliationRepository.count({
-      where: { conciliationsState: true },
+      // where: { conciliationsState: true },
     });
     const pending = total - completed;
 

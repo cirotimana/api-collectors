@@ -11,8 +11,8 @@ export class Liquidation {
   @Column({ name: 'collector_id' })
   collectorId: number;
 
-  @Column({ name: 'liquidations_type', type: 'int' })
-  liquidationsType: number;
+  // @Column({ name: 'liquidations_type', type: 'int' })
+  // liquidationsType: number;
 
   @Column({ name: 'from_date', type: 'date' })
   fromDate: Date;
@@ -29,8 +29,8 @@ export class Liquidation {
   @Column({ name: 'difference_amounts', type: 'decimal', precision: 10, scale: 2 })
   differenceAmounts: number;
 
-  @Column({ name: 'liquidations_state', type: 'boolean' })
-  liquidationsState: boolean;
+  // @Column({ name: 'liquidations_state', type: 'boolean' })
+  // liquidationsState: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

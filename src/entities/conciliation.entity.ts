@@ -11,8 +11,8 @@ export class Conciliation {
   @Column({ name: 'collector_id' })
   collectorId: number;
 
-  @Column({ name: 'conciliations_type', type: 'int' })
-  conciliationsType: number;
+  // @Column({ name: 'conciliations_type', type: 'int' })
+  // conciliationsType: number;
 
   @Column({ name: 'from_date', type: 'date' })
   fromDate: Date;
@@ -29,8 +29,26 @@ export class Conciliation {
   @Column({ name: 'difference_amounts', type: 'decimal', precision: 10, scale: 2 })
   differenceAmounts: number;
 
-  @Column({ name: 'conciliations_state', type: 'boolean' })
-  conciliationsState: boolean;
+  @Column({ name: 'records_calimaco', type: 'int' })
+  recordsCalimaco: number;
+
+  @Column({ name: 'records_collector', type: 'int' })
+  recordsCollector: number;
+
+  @Column({ name: 'unreconciled_records_calimaco', type: 'int' })
+  unreconciledRecordsCalimaco: number;
+
+  @Column({ name: 'unreconciled_records_collector', type: 'int' })
+  unreconciledRecordsCollector: number;
+
+  @Column({ name: 'unreconciled_amount_calimaco', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledAmountCalimaco: number;
+
+  @Column({ name: 'unreconciled_amount_collector', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledAmountCollector: number;
+
+  // @Column({ name: 'conciliations_state', type: 'boolean' })
+  // conciliationsState: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

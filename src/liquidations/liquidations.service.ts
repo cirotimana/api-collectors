@@ -39,7 +39,7 @@ export class LiquidationsService {
   async getStats() {
     const total = await this.liquidationRepository.count();
     const completed = await this.liquidationRepository.count({
-      where: { liquidationsState: true },
+      // where: { liquidationsState: true },
     });
     const pending = total - completed;
 
