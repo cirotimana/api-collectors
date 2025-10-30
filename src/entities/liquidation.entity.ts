@@ -26,6 +26,24 @@ export class Liquidation {
   @Column({ name: 'amount_liquidation', type: 'decimal', precision: 10, scale: 2 })
   amountLiquidation: number;
 
+  @Column({ name: 'records_collector', type: 'int' })
+  recordsCollector: number;
+
+  @Column({ name: 'records_liquidation', type: 'int' })
+  recordsLiquidation: number;
+
+  @Column({ name: 'debit_amount_collector', type: 'decimal', precision: 10, scale: 2 })
+  debitAmountCollector: number;
+
+  @Column({ name: 'debit_amount_liquidation', type: 'decimal', precision: 10, scale: 2 })
+  debitAmountLiquidation: number;
+
+  @Column({ name: 'credit_amount_collector', type: 'decimal', precision: 10, scale: 2 })
+  creditAmountCollector: number;
+
+  @Column({ name: 'credit_amount_liquidation', type: 'decimal', precision: 10, scale: 2 })
+  creditAmountLiquidation: number;
+
   @Column({ name: 'difference_amounts', type: 'decimal', precision: 10, scale: 2 })
   differenceAmounts: number;
 
