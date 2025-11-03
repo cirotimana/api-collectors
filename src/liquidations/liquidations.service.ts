@@ -36,25 +36,48 @@ export class LiquidationsService {
     .getMany();
   }
 
-  async getStats() {
-    const total = await this.liquidationRepository.count();
-    const completed = await this.liquidationRepository.count({
-      // where: { liquidationsState: true },
-    });
-    const pending = total - completed;
+  async getStats(collectorId: number, fromDate?: string, toDate?: string) {
+  const query = `
+    SELECT * 
+    FROM get_liquidations_summary(
+      $1,
+      COALESCE($2::date, NULL),
+      COALESCE($3::date, NULL)
+    )
+  `;
 
-    const totalAmount = await this.liquidationRepository
-      .createQueryBuilder('l')
-      .select('SUM(l.amount_liquidation)', 'sum')
-      .getRawOne();
+  const [result] = await this.liquidationRepository.query(query, [
+    collectorId,
+    fromDate || null,
+    toDate || null,
+  ]);
 
-    return {
-      total,
-      completed,
-      pending,
-      totalAmount: parseFloat(totalAmount.sum) || 0,
+  return {
+    totalAmountCollector: parseFloat(result?.total_amount_collector) || 0,
+    totalAmountLiquidation: parseFloat(result?.total_amount_liquidation) || 0,
     };
   }
+
+  async getSummary(collectorIds: number[], fromDate?: string, toDate?: string) {
+    const query = `
+      SELECT *
+      FROM get_liquidations_summary_by_day(
+        $1::int[],
+        COALESCE($2::date, NULL),
+        COALESCE($3::date, NULL)
+      )
+    `;
+
+    const result = await this.liquidationRepository.query(query, [
+      collectorIds,
+      fromDate || null,
+      toDate || null,
+    ]);
+
+    return result;
+  }
+
+
 
   async findByCollector(collectorName: string) {
     return await this.liquidationRepository

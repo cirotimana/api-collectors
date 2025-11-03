@@ -11,8 +11,25 @@ export class ConciliationsController {
   }
 
   @Get('stats')
-  getStats() {
-    return this.conciliationsService.getStats();
+  async getStats(
+    @Query('collectorId') collectorId: number,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+  ) {
+    return this.conciliationsService.getStats(collectorId, fromDate, toDate);
+  }
+
+    @Get('summary')
+  async getSummary(
+    @Query('collectorIds') collectorIds?: string,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+  ) {
+    const ids = collectorIds
+        ? collectorIds.split(',').map((id) => Number(id)).filter((n) => !isNaN(n))
+        : [1, 2, 3];
+
+    return this.conciliationsService.getSummary(ids, fromDate, toDate);
   }
 
 

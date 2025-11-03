@@ -36,9 +36,6 @@ export class ConciliationsService {
     });
   }
 
-  
-
-  
 
   async findByCollector(collectorName: string) {
     return await this.conciliationRepository
@@ -59,23 +56,47 @@ export class ConciliationsService {
     return { message: `Conciliation ${id} eliminada correctamente` };
   }
 
-  async getStats() {
-    const total = await this.conciliationRepository.count();
-    const completed = await this.conciliationRepository.count({
-      // where: { conciliationsState: true },
-    });
-    const pending = total - completed;
 
-    const totalAmount = await this.conciliationRepository
-      .createQueryBuilder('c')
-      .select('SUM(c.amount)', 'sum')
-      .getRawOne();
+  async getStats(collectorId: number, fromDate?: string, toDate?: string) {
+  const query = `
+    SELECT * 
+    FROM get_conciliations_summary(
+      $1,
+      COALESCE($2::date, NULL),
+      COALESCE($3::date, NULL)
+    )
+  `;
 
-    return {
-      total,
-      completed,
-      pending,
-      totalAmount: parseFloat(totalAmount.sum) || 0,
+  const [result] = await this.conciliationRepository.query(query, [
+    collectorId,
+    fromDate || null,
+    toDate || null,
+  ]);
+
+  return {
+    totalAmount: parseFloat(result?.total_amount) || 0,
+    totalAmountCollector: parseFloat(result?.total_amount_collector) || 0,
     };
   }
+  
+
+  async getSummary(collectorIds: number[], fromDate?: string, toDate?: string) {
+    const query = `
+      SELECT *
+      FROM get_conciliations_summary_by_day(
+        $1::int[],
+        COALESCE($2::date, NULL),
+        COALESCE($3::date, NULL)
+      )
+    `;
+
+    const result = await this.conciliationRepository.query(query, [
+      collectorIds,
+      fromDate || null,
+      toDate || null,
+    ]);
+
+    return result;
+  }
+
 }
