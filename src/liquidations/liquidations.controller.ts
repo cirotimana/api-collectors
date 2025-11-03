@@ -11,9 +11,28 @@ export class LiquidationsController {
   }
 
   @Get('stats')
-  getStats() {
-    return this.liquidationsService.getStats();
+  async getStats(
+    @Query('collectorId') collectorId: number,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+  ) {
+    return this.liquidationsService.getStats(collectorId, fromDate, toDate);
   }
+
+    
+    @Get('summary')
+    async getSummary(
+      @Query('collectorIds') collectorIds?: string,
+      @Query('fromDate') fromDate?: string,
+      @Query('toDate') toDate?: string,
+    ) {
+      const ids = collectorIds
+        ? collectorIds.split(',').map((id) => Number(id)).filter((n) => !isNaN(n))
+        : [1, 2, 3];
+
+      return this.liquidationsService.getSummary(ids, fromDate, toDate);
+    }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
