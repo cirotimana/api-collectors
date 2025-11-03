@@ -16,8 +16,8 @@ export class ConciliationsService {
     .leftJoinAndSelect('conciliation.collector', 'collector')
     .leftJoinAndSelect('conciliation.createdBy', 'createdBy')
     .leftJoinAndSelect('conciliation.files', 'files')
-    .where('DATE(conciliation.fromDate) >= DATE(:from)', { from })
-    .andWhere('DATE(conciliation.toDate) <= DATE(:to)', { to })
+    .where('DATE(conciliation.fromDate) = DATE(:from)', { from })
+    .andWhere('DATE(conciliation.toDate) = DATE(:to)', { to })
     .orderBy('conciliation.fromDate', 'DESC')
     .getMany();
   }
@@ -78,7 +78,7 @@ export class ConciliationsService {
     totalAmountCollector: parseFloat(result?.total_amount_collector) || 0,
     };
   }
-  
+
 
   async getSummary(collectorIds: number[], fromDate?: string, toDate?: string) {
     const query = `

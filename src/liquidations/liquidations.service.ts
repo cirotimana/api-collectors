@@ -30,8 +30,8 @@ export class LiquidationsService {
     .leftJoinAndSelect('liquidation.collector', 'collector')
     .leftJoinAndSelect('liquidation.createdBy', 'createdBy')
     .leftJoinAndSelect('liquidation.files', 'files')
-    .where('DATE(liquidation.fromDate) >= DATE(:from)', { from })
-    .andWhere('DATE(liquidation.toDate) <= DATE(:to)', { to })
+    .where('DATE(liquidation.fromDate) = DATE(:from)', { from })
+    .andWhere('DATE(liquidation.toDate) = DATE(:to)', { to })
     .orderBy('liquidation.fromDate', 'DESC')
     .getMany();
   }
