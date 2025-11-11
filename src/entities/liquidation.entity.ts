@@ -11,8 +11,8 @@ export class Liquidation {
   @Column({ name: 'collector_id' })
   collectorId: number;
 
-  // @Column({ name: 'liquidations_type', type: 'int' })
-  // liquidationsType: number;
+  @Column({ name: 'liquidations_type', type: 'int' })
+  liquidationsType: number;
 
   @Column({ name: 'from_date', type: 'date' })
   fromDate: Date;
@@ -47,8 +47,26 @@ export class Liquidation {
   @Column({ name: 'difference_amounts', type: 'decimal', precision: 10, scale: 2 })
   differenceAmounts: number;
 
-  // @Column({ name: 'liquidations_state', type: 'boolean' })
-  // liquidationsState: boolean;
+  @Column({ name: 'unreconciled_debit_amount_collector', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledDebitAmountCollector: number;
+
+  @Column({ name: 'unreconciled_debit_amount_liquidation', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledDebitAmountLiquidation: number;
+
+  @Column({ name: 'unreconciled_credit_amount_collector', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledCreditAmountCollector: number;
+
+  @Column({ name: 'unreconciled_credit_amount_liquidation', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledCreditAmountLiquidation: number;
+
+  @Column({ name: 'unreconciled_amount_collector', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledAmountCollector: number;
+
+  @Column({ name: 'unreconciled_amount_liquidation', type: 'decimal', precision: 10, scale: 2 })
+  unreconciledAmountLiquidation: number;
+
+  @Column({ name: 'liquidations_state', type: 'boolean' })
+  liquidationsState: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;

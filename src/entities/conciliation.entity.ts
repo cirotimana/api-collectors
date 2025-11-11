@@ -11,8 +11,8 @@ export class Conciliation {
   @Column({ name: 'collector_id' })
   collectorId: number;
 
-  // @Column({ name: 'conciliations_type', type: 'int' })
-  // conciliationsType: number;
+  @Column({ name: 'conciliations_type', type: 'int' })
+  conciliationsType: number;
 
   @Column({ name: 'from_date', type: 'date' })
   fromDate: Date;
@@ -47,8 +47,8 @@ export class Conciliation {
   @Column({ name: 'unreconciled_amount_collector', type: 'decimal', precision: 10, scale: 2 })
   unreconciledAmountCollector: number;
 
-  // @Column({ name: 'conciliations_state', type: 'boolean' })
-  // conciliationsState: boolean;
+  @Column({ name: 'conciliations_state', type: 'boolean' })
+  conciliationsState: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
