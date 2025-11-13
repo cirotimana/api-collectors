@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConciliationsModule } from './conciliations/conciliations.module';
 import { LiquidationsModule } from './liquidations/liquidations.module';
+import { ReconciliationDiscrepanciesModule } from './reconciliation-discrepancies/reconciliation-discrepancies.module';
 
 // Entities
 import { Collector } from './entities/collector.entity';
@@ -12,6 +13,8 @@ import { ConciliationFile } from './entities/conciliation-file.entity';
 import { Liquidation } from './entities/liquidation.entity';
 import { LiquidationFile } from './entities/liquidation-file.entity';
 import { Channel } from './entities/channel.entity';
+import { ReconciliationDiscrepancy } from './entities/reconciliation-discrepancies.entity';
+
 
 
 @Module({
@@ -29,7 +32,7 @@ import { Channel } from './entities/channel.entity';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
-        entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel],
+        entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel, ReconciliationDiscrepancy],
         synchronize: false, // IMPORTANTE: false en produccion
         logging: configService.get('NODE_ENV') === 'development',
       }),
@@ -37,6 +40,7 @@ import { Channel } from './entities/channel.entity';
     }),
     ConciliationsModule,
     LiquidationsModule,
+    ReconciliationDiscrepanciesModule,
   ],
 })
 export class AppModule {}
