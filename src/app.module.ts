@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConciliationsModule } from './conciliations/conciliations.module';
 import { LiquidationsModule } from './liquidations/liquidations.module';
 import { ReconciliationDiscrepanciesModule } from './reconciliation-discrepancies/reconciliation-discrepancies.module';
+import { CalimacoRecordsModule } from './calimaco-records/calimaco-records.module';
+import { CollectorRecordsModule } from './collector-records/collector-records.module';
+import { ConciliationReportsModule } from './conciliation-reports/conciliation-reports.module';
+import { CollectorsModule } from './collectors/collectors.module';
 
 // Entities
 import { Collector } from './entities/collector.entity';
@@ -14,6 +18,8 @@ import { Liquidation } from './entities/liquidation.entity';
 import { LiquidationFile } from './entities/liquidation-file.entity';
 import { Channel } from './entities/channel.entity';
 import { ReconciliationDiscrepancy } from './entities/reconciliation-discrepancies.entity';
+import { CalimacoRecord } from './entities/calimaco-record.entity';
+import { CollectorRecord } from './entities/collector-record.entity';
 
 
 
@@ -32,7 +38,7 @@ import { ReconciliationDiscrepancy } from './entities/reconciliation-discrepanci
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
-        entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel, ReconciliationDiscrepancy],
+        entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel, ReconciliationDiscrepancy, CalimacoRecord, CollectorRecord],
         synchronize: false, // IMPORTANTE: false en produccion
         logging: configService.get('NODE_ENV') === 'development',
       }),
@@ -41,6 +47,10 @@ import { ReconciliationDiscrepancy } from './entities/reconciliation-discrepanci
     ConciliationsModule,
     LiquidationsModule,
     ReconciliationDiscrepanciesModule,
+    CalimacoRecordsModule,
+    CollectorRecordsModule,
+    ConciliationReportsModule,
+    CollectorsModule,
   ],
 })
 export class AppModule {}
