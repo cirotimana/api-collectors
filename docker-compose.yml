@@ -6,6 +6,10 @@ services:
       - "3040:3040"
     environment:
       - NODE_ENV=production
+      - TZ=America/Lima
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     restart: unless-stopped
     networks:
       - app-network
