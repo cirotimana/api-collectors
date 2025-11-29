@@ -37,15 +37,15 @@ export class CalimacoRecordsService {
     return record;
   }
 
-  async findByCalimacoId(calimacoId: string): Promise<CalimacoRecord[]> {
+  async findByCalimacoId(calimacoIdNormalized: string): Promise<CalimacoRecord[]> {
     const records = await this.calimacoRecordRepository.find({
-      where: { calimacoId },
+      where: { calimacoIdNormalized },
       relations: ['collector'],
       order: { recordDate: 'DESC' },
     });
 
     if (!records.length) {
-      throw new NotFoundException(`Calimaco records with calimacoId ${calimacoId} not found`);
+      throw new NotFoundException(`Calimaco records with calimacoId ${calimacoIdNormalized} not found`);
     }
 
     return records;
