@@ -1,6 +1,10 @@
-import { Controller, Get, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { ConciliationsService } from './conciliations.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Conciliations')
+@ApiBearerAuth()
 @Controller('conciliations')
 export class ConciliationsController {
   constructor(private readonly conciliationsService: ConciliationsService) {}

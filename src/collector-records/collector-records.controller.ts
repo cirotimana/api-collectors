@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { CollectorRecordsService } from './collector-records.service';
 import { CreateCollectorRecordDto } from './dto/create-collector-record.dto';
 import { UpdateCollectorRecordDto } from './dto/update-collector-record.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Collector Records')
+@ApiBearerAuth()
 @Controller('collector-records')
 export class CollectorRecordsController {
   constructor(private readonly collectorRecordsService: CollectorRecordsService) {}

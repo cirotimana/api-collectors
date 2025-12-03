@@ -8,6 +8,9 @@ import { CalimacoRecordsModule } from './calimaco-records/calimaco-records.modul
 import { CollectorRecordsModule } from './collector-records/collector-records.module';
 import { ConciliationReportsModule } from './conciliation-reports/conciliation-reports.module';
 import { CollectorsModule } from './collectors/collectors.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { RolesModule } from './roles/roles.module';
 
 // Entities
 import { Collector } from './entities/collector.entity';
@@ -20,8 +23,8 @@ import { Channel } from './entities/channel.entity';
 import { ReconciliationDiscrepancy } from './entities/reconciliation-discrepancies.entity';
 import { CalimacoRecord } from './entities/calimaco-record.entity';
 import { CollectorRecord } from './entities/collector-record.entity';
-
-
+import { Role } from './entities/role.entity';
+import { UserRole } from './entities/user-role.entity';
 
 @Module({
   imports: [
@@ -38,7 +41,7 @@ import { CollectorRecord } from './entities/collector-record.entity';
         username: configService.get('DB_USER'),
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
-        entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel, ReconciliationDiscrepancy, CalimacoRecord, CollectorRecord],
+        entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel, ReconciliationDiscrepancy, CalimacoRecord, CollectorRecord, Role, UserRole],
         synchronize: false, // IMPORTANTE: false en produccion
         logging: configService.get('NODE_ENV') === 'development',
       }),
@@ -51,6 +54,9 @@ import { CollectorRecord } from './entities/collector-record.entity';
     CollectorRecordsModule,
     ConciliationReportsModule,
     CollectorsModule,
+    UsersModule,
+    AuthModule,
+    RolesModule,
   ],
 })
 export class AppModule {}

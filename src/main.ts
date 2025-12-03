@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -21,6 +22,16 @@ async function bootstrap() {
 
   // Prefix global
   app.setGlobalPrefix('api');
+
+  // Swagger
+  const config = new DocumentBuilder()
+    .setTitle('API Collectors')
+    .setDescription('The API Collectors description')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.PORT || 3040;
   await app.listen(port, '0.0.0.0');

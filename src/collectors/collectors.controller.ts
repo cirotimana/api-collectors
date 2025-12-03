@@ -1,6 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { CollectorsService } from './collectors.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Collectors')
+@ApiBearerAuth()
 @Controller('collectors')
 export class CollectorsController {
   constructor(private readonly collectorsService: CollectorsService) {}

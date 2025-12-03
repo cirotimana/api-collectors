@@ -1,8 +1,12 @@
-import { Controller, Post, Body, Query, Get } from '@nestjs/common';
+import { Controller, Post, Body, Query, Get, UseGuards } from '@nestjs/common';
 import { ConciliationReportsService } from './conciliation-reports.service';
 import { ConciliationReportDto } from './dto/conciliation-report.dto';
 import { SalesReportDto } from './dto/sales-report.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Conciliation Reports')
+@ApiBearerAuth()
 @Controller('conciliation-reports')
 export class ConciliationReportsController {
   constructor(
