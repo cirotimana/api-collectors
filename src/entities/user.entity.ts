@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColum
 import { Conciliation } from './conciliation.entity';
 import { Liquidation } from './liquidation.entity';
 import { Channel } from './channel.entity';
+import { UserRole } from './user-role.entity';
 
 @Entity('users')
 export class User {
@@ -60,4 +61,7 @@ export class User {
 
   @OneToMany(() => Liquidation, (liquidation) => liquidation.createdBy)
   liquidations: Liquidation[];
+
+  @OneToMany(() => UserRole, (userRole) => userRole.user)
+  userRoles: UserRole[];
 }

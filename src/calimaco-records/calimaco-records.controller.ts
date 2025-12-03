@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { CalimacoRecordsService } from './calimaco-records.service';
 import { CreateCalimacoRecordDto } from './dto/create-calimaco-record.dto';
 import { UpdateCalimacoRecordDto } from './dto/update-calimaco-record.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@ApiTags('Calimaco Records')
+@ApiBearerAuth()
 @Controller('calimaco-records')
 export class CalimacoRecordsController {
   constructor(private readonly calimacoRecordsService: CalimacoRecordsService) {}
