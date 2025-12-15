@@ -224,4 +224,34 @@ export class ConciliationReportsService {
       totalPages: Math.ceil(total / limit),
     };
   }
+
+  async getConciliacionCompletaAcumulado(
+    collectorIds?: number[],
+    fromDate?: string,
+    toDate?: string,
+  ) {
+    // Valores por defecto
+    const defaultCollectorIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    
+    // Usar valores por defecto si no se proporcionan
+    const finalCollectorIds = collectorIds && collectorIds.length > 0 ? collectorIds : defaultCollectorIds;
+    const finalFromDate = fromDate 
+      ? (fromDate.includes(':') ? fromDate : `${fromDate} 00:00:00`)
+      : `${currentDate} 00:00:00`;
+    const finalToDate = toDate 
+      ? (toDate.includes(':') ? toDate : `${toDate} 23:59:59`)
+      : `${currentDate} 23:59:59`;
+    
+    const query = `
+      SELECT * FROM get_conciliacion_completa_acumulado($1, $2, $3)
+    `;
+
+    return await this.calimacoRecordRepository.query(query, [
+      finalCollectorIds,
+      finalFromDate,
+      finalToDate,
+    ]);
+  }
 }
