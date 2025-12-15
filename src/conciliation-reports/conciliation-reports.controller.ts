@@ -120,4 +120,18 @@ export class ConciliationReportsController {
       limit ? +limit : 50,
     );
   }
+
+  @Get('conciliacion-completa-acumulado')
+  getConciliacionCompletaAcumulado(
+    @Query('collectorIds') collectorIds?: string,
+    @Query('fromDate') fromDate?: string,
+    @Query('toDate') toDate?: string,
+  ) {
+    const ids = collectorIds ? collectorIds.split(',').map(id => parseInt(id.trim())) : undefined;
+    return this.conciliationReportsService.getConciliacionCompletaAcumulado(
+      ids,
+      fromDate,
+      toDate,
+    );
+  }
 }
