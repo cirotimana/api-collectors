@@ -4,6 +4,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from '../repository/users.repository';
+import { PAGINATION } from '../../../common/constants/constants';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +26,7 @@ export class UsersService {
     return savedUser;
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<{ data: User[]; total: number }> {
+  async findAll(page: number = PAGINATION.DEFAULT_PAGE, limit: number = PAGINATION.DEFAULT_LIMIT): Promise<{ data: User[]; total: number }> {
     return this.usersRepository.findAll(page, limit);
   }
 

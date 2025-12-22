@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UsersRepository } from '../repository/users.repository';
+import { PAGINATION } from '../../../common/constants/constants';
 
 jest.mock('bcrypt');
 
@@ -65,7 +66,7 @@ describe('UsersService', () => {
 
       const result = await service.findAll();
 
-      expect(usersRepository.findAll).toHaveBeenCalledWith(1, 10);
+      expect(usersRepository.findAll).toHaveBeenCalledWith(PAGINATION.DEFAULT_PAGE, PAGINATION.DEFAULT_LIMIT);
       expect(result).toEqual({ data: users, total: 1 });
     });
 
