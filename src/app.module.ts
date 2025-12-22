@@ -1,30 +1,23 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConciliationsModule } from './conciliations/conciliations.module';
-import { LiquidationsModule } from './liquidations/liquidations.module';
-import { ReconciliationDiscrepanciesModule } from './reconciliation-discrepancies/reconciliation-discrepancies.module';
-import { CalimacoRecordsModule } from './calimaco-records/calimaco-records.module';
-import { CollectorRecordsModule } from './collector-records/collector-records.module';
-import { ConciliationReportsModule } from './conciliation-reports/conciliation-reports.module';
-import { CollectorsModule } from './collectors/collectors.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { RolesModule } from './roles/roles.module';
+import { ConciliationsModule } from './modules/conciliations/conciliations.module';
+import { LiquidationsModule } from './modules/liquidations/liquidations.module';
+import { ReconciliationDiscrepanciesModule } from './modules/reconciliation-discrepancies/reconciliation-discrepancies.module';
+import { CalimacoRecordsModule } from './modules/calimaco-records/calimaco-records.module';
+import { CollectorRecordsModule } from './modules/collector-records/collector-records.module';
+import { ConciliationReportsModule } from './modules/conciliation-reports/conciliation-reports.module';
+import { CollectorsModule } from './modules/collectors/collectors.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+import { ResponseInterceptor } from './interceptors/response.interceptor';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { getDatabaseConfig } from './database/database.config';
 
-// Entities
-import { Collector } from './entities/collector.entity';
-import { User } from './entities/user.entity';
-import { Conciliation } from './entities/conciliation.entity';
-import { ConciliationFile } from './entities/conciliation-file.entity';
-import { Liquidation } from './entities/liquidation.entity';
-import { LiquidationFile } from './entities/liquidation-file.entity';
-import { Channel } from './entities/channel.entity';
-import { ReconciliationDiscrepancy } from './entities/reconciliation-discrepancies.entity';
-import { CalimacoRecord } from './entities/calimaco-record.entity';
-import { CollectorRecord } from './entities/collector-record.entity';
-import { Role } from './entities/role.entity';
-import { UserRole } from './entities/user-role.entity';
+
 
 @Module({
   imports: [
@@ -34,17 +27,7 @@ import { UserRole } from './entities/user-role.entity';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
-        username: configService.get('DB_USER'),
-        password: configService.get('DB_PASS'),
-        database: configService.get('DB_NAME'),
-        entities: [Collector, User, Conciliation, ConciliationFile, Liquidation, LiquidationFile, Channel, ReconciliationDiscrepancy, CalimacoRecord, CollectorRecord, Role, UserRole],
-        synchronize: false, // IMPORTANTE: false en produccion
-        logging: configService.get('NODE_ENV') === 'development',
-      }),
+      useFactory: getDatabaseConfig,
       inject: [ConfigService],
     }),
     ConciliationsModule,
@@ -57,6 +40,20 @@ import { UserRole } from './entities/user-role.entity';
     UsersModule,
     AuthModule,
     RolesModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export class AppModule {}
