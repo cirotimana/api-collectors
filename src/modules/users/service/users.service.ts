@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
@@ -40,6 +40,7 @@ export class UsersService {
 
   async findAll(page: number = 1, limit: number = 10): Promise<{ data: User[]; total: number }> {
     const [data, total] = await this.usersRepository.findAndCount({
+      where: { deletedAt: IsNull() },
       skip: (page - 1) * limit,
       take: limit,
       order: { createdAt: 'DESC' },
@@ -51,14 +52,14 @@ export class UsersService {
 
   async findOne(username: string): Promise<User | null> {
     return this.usersRepository.findOne({ 
-      where: { username },
+      where: { username, deletedAt: IsNull() },
       relations: ['userRoles', 'userRoles.role']
     });
   }
 
   async findOneById(id: number): Promise<User | null> {
     return this.usersRepository.findOne({ 
-      where: { id },
+      where: { id, deletedAt: IsNull() },
       relations: ['userRoles', 'userRoles.role']
     });
   }
@@ -75,14 +76,8 @@ export class UsersService {
 
     await this.usersRepository.update(id, updateData);
 
-    if (roleId) {
-      // Check if user already has a role, if so update it, else create new
-      // Assuming single role per user for simplicity based on request "asigne un rol"
-      // But table is many-to-many. I'll clear existing roles and add new one to enforce single role if that's the logic,
-      // or just add it. The request says "este se cree en users_roles o se edite si es que ya esiste con otro rol".
-      // This implies 1 user - 1 role logic effectively, or replacing the role.
-      
-      // Let's find existing user role
+    if (roleId) {      
+      // Buscar rol de usuario existente
       const existingUserRole = await this.userRolesRepository.findOne({ where: { userId: id } });
       if (existingUserRole) {
         await this.userRolesRepository.update(existingUserRole.id, { roleId });
@@ -99,8 +94,14 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.userRolesRepository.delete({ userId: id }); // Clean up roles first
-    await this.usersRepository.delete(id);
+    //await this.userRolesRepository.delete({ userId: id }); // Limpiar roles primero
+    await this.userRolesRepository.update({ userId: id }, { deletedAt: new Date() });
+    
+    // Soft delete: cambiar estado a false y establecer fecha de eliminacion
+    await this.usersRepository.update(id, {
+      isActive: false,
+      deletedAt: new Date(),
+    });
   }
 }
 
