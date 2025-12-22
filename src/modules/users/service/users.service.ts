@@ -1,67 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { UserRole } from '../../../entities/user-role.entity';
+import { UsersRepository } from '../repository/users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    @InjectRepository(UserRole)
-    private userRolesRepository: Repository<UserRole>,
-  ) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password, roleId, ...userData } = createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    const user = this.usersRepository.create({
+    const savedUser = await this.usersRepository.create({
       ...userData,
       password: hashedPassword,
     });
-    
-    const savedUser = await this.usersRepository.save(user);
 
     if (roleId) {
-      const userRole = this.userRolesRepository.create({
-        userId: savedUser.id,
-        roleId: roleId,
-      });
-      await this.userRolesRepository.save(userRole);
+      await this.usersRepository.createUserRole(savedUser.id, roleId);
     }
 
     return savedUser;
   }
 
   async findAll(page: number = 1, limit: number = 10): Promise<{ data: User[]; total: number }> {
-    const [data, total] = await this.usersRepository.findAndCount({
-      where: { deletedAt: IsNull() },
-      skip: (page - 1) * limit,
-      take: limit,
-      order: { createdAt: 'DESC' },
-      relations: ['userRoles', 'userRoles.role'],
-    });
-
-    return { data, total };
+    return this.usersRepository.findAll(page, limit);
   }
 
   async findOne(username: string): Promise<User | null> {
-    return this.usersRepository.findOne({ 
-      where: { username, deletedAt: IsNull() },
-      relations: ['userRoles', 'userRoles.role']
-    });
+    return this.usersRepository.findOneByUsername(username);
   }
 
   async findOneById(id: number): Promise<User | null> {
-    return this.usersRepository.findOne({ 
-      where: { id, deletedAt: IsNull() },
-      relations: ['userRoles', 'userRoles.role']
-    });
+    return this.usersRepository.findOneById(id);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
@@ -76,17 +49,12 @@ export class UsersService {
 
     await this.usersRepository.update(id, updateData);
 
-    if (roleId) {      
-      // Buscar rol de usuario existente
-      const existingUserRole = await this.userRolesRepository.findOne({ where: { userId: id } });
+    if (roleId) {
+      const existingUserRole = await this.usersRepository.findUserRoleByUserId(id);
       if (existingUserRole) {
-        await this.userRolesRepository.update(existingUserRole.id, { roleId });
+        await this.usersRepository.updateUserRole(existingUserRole.id, roleId);
       } else {
-        const userRole = this.userRolesRepository.create({
-          userId: id,
-          roleId: roleId,
-        });
-        await this.userRolesRepository.save(userRole);
+        await this.usersRepository.createUserRole(id, roleId);
       }
     }
 
@@ -94,14 +62,8 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
-    //await this.userRolesRepository.delete({ userId: id }); // Limpiar roles primero
-    await this.userRolesRepository.update({ userId: id }, { deletedAt: new Date() });
-    
-    // Soft delete: cambiar estado a false y establecer fecha de eliminacion
-    await this.usersRepository.update(id, {
-      isActive: false,
-      deletedAt: new Date(),
-    });
+    await this.usersRepository.softDeleteUserRoles(id);
+    await this.usersRepository.softDelete(id);
   }
 }
 

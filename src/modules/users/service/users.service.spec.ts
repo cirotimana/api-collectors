@@ -1,55 +1,44 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { User } from '../entities/user.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { UserRole } from '../../../entities/user-role.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UsersRepository } from '../repository/users.repository';
 
 jest.mock('bcrypt');
 
 describe('UsersService', () => {
   let service: UsersService;
-  let usersRepository: jest.Mocked<Repository<User>>;
-  let userRolesRepository: jest.Mocked<Repository<UserRole>>;
+  let usersRepository: jest.Mocked<UsersRepository>;
 
-  const mockUsersRepository = () => ({
+  const mockUsersRepository = {
+    findAll: jest.fn(),
+    findOneByUsername: jest.fn(),
+    findOneById: jest.fn(),
     create: jest.fn(),
-    save: jest.fn(),
-    findAndCount: jest.fn(),
-    findOne: jest.fn(),
     update: jest.fn(),
-    delete: jest.fn(),
-  })
-
-  const mockUserRolesRepository = () => ({
-    create: jest.fn(),
-    save: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  })
+    softDelete: jest.fn(),
+    findUserRoleByUserId: jest.fn(),
+    createUserRole: jest.fn(),
+    updateUserRole: jest.fn(),
+    softDeleteUserRoles: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
         {
-          provide: getRepositoryToken(User),
-          useFactory: mockUsersRepository,
-        },
-        {
-          provide: getRepositoryToken(UserRole),
-          useFactory: mockUserRolesRepository,
+          provide: UsersRepository,
+          useValue: mockUsersRepository,
         },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    usersRepository = module.get(getRepositoryToken(User));
-    userRolesRepository = module.get(getRepositoryToken(UserRole));
+    usersRepository = module.get(UsersRepository);
   });
 
   afterEach(() => {
@@ -61,68 +50,48 @@ describe('UsersService', () => {
   describe('findAll', () => {
     it('should return paginated users', async () => {
       const users = [{ id: 1 }, { id: 2 }] as User[];
-      usersRepository.findAndCount.mockResolvedValue([users, 2]);
+      usersRepository.findAll.mockResolvedValue({ data: users, total: 2 });
 
       const result = await service.findAll(1, 10);
 
-      expect(usersRepository.findAndCount).toHaveBeenCalledWith({
-        skip: 0,
-        take: 10,
-        order: { createdAt: 'DESC' },
-        relations: ['userRoles', 'userRoles.role'],
-      });
+      expect(usersRepository.findAll).toHaveBeenCalledWith(1, 10);
       expect(result).toEqual({ data: users, total: 2 });
       expect(result.data).toHaveLength(2);
     });
 
     it('should return paginated users with default values', async () => {
       const users = [{ id: 1 }] as User[];
-      usersRepository.findAndCount.mockResolvedValue([users, 1]);
+      usersRepository.findAll.mockResolvedValue({ data: users, total: 1 });
 
       const result = await service.findAll();
 
-      expect(usersRepository.findAndCount).toHaveBeenCalledWith({
-        skip: 0,
-        take: 10,
-        order: { createdAt: 'DESC' },
-        relations: ['userRoles', 'userRoles.role'],
-      });
+      expect(usersRepository.findAll).toHaveBeenCalledWith(1, 10);
       expect(result).toEqual({ data: users, total: 1 });
     });
 
     it('should return paginated users with custom page and limit', async () => {
       const users = [{ id: 3 }, { id: 4 }] as User[];
-      usersRepository.findAndCount.mockResolvedValue([users, 10]);
+      usersRepository.findAll.mockResolvedValue({ data: users, total: 10 });
 
       const result = await service.findAll(2, 5);
 
-      expect(usersRepository.findAndCount).toHaveBeenCalledWith({
-        skip: 5,
-        take: 5,
-        order: { createdAt: 'DESC' },
-        relations: ['userRoles', 'userRoles.role'],
-      });
+      expect(usersRepository.findAll).toHaveBeenCalledWith(2, 5);
       expect(result).toEqual({ data: users, total: 10 });
       expect(result.total).toBe(10);
     });
 
     it('should calculate skip correctly for page 3 with limit 20', async () => {
       const users = [{ id: 41 }, { id: 42 }] as User[];
-      usersRepository.findAndCount.mockResolvedValue([users, 100]);
+      usersRepository.findAll.mockResolvedValue({ data: users, total: 100 });
 
       const result = await service.findAll(3, 20);
 
-      expect(usersRepository.findAndCount).toHaveBeenCalledWith({
-        skip: 40,
-        take: 20,
-        order: { createdAt: 'DESC' },
-        relations: ['userRoles', 'userRoles.role'],
-      });
+      expect(usersRepository.findAll).toHaveBeenCalledWith(3, 20);
       expect(result.total).toBe(100);
     });
 
     it('should return empty array when no users found', async () => {
-      usersRepository.findAndCount.mockResolvedValue([[], 0]);
+      usersRepository.findAll.mockResolvedValue({ data: [], total: 0 });
 
       const result = await service.findAll(1, 10);
 
@@ -133,20 +102,16 @@ describe('UsersService', () => {
   describe('findOne', () => {
     it('should return a user by username', async () => {
       const user = { id: 1, username: 'testuser' } as User;
-      usersRepository.findOne.mockResolvedValue(user);
+      usersRepository.findOneByUsername.mockResolvedValue(user);
       const result = await service.findOne('testuser');
-      expect(usersRepository.findOne).toHaveBeenCalledWith({ 
-        where: { username: 'testuser' },
-        relations: ['userRoles', 'userRoles.role'] });
+      expect(usersRepository.findOneByUsername).toHaveBeenCalledWith('testuser');
       expect(result).toEqual(user);
     });
 
     it('should return null when user not found', async () => {
-      usersRepository.findOne.mockResolvedValue(null);
+      usersRepository.findOneByUsername.mockResolvedValue(null);
       const result = await service.findOne('nonexistent');
-      expect(usersRepository.findOne).toHaveBeenCalledWith({ 
-        where: { username: 'nonexistent' },
-        relations: ['userRoles', 'userRoles.role'] });
+      expect(usersRepository.findOneByUsername).toHaveBeenCalledWith('nonexistent');
       expect(result).toBeNull();
     });
   });
@@ -154,20 +119,16 @@ describe('UsersService', () => {
   describe('findOneById', () => {
     it('should return a user by id', async () => {
       const user = { id: 1, username: 'testuser' } as User;
-      usersRepository.findOne.mockResolvedValue(user);
+      usersRepository.findOneById.mockResolvedValue(user);
       const result = await service.findOneById(1);
-      expect(usersRepository.findOne).toHaveBeenCalledWith({ 
-        where: { id: 1 }, 
-        relations: ['userRoles', 'userRoles.role'] });
+      expect(usersRepository.findOneById).toHaveBeenCalledWith(1);
       expect(result).toEqual(user);
     });
 
     it('should return null when user not found', async () => {
-      usersRepository.findOne.mockResolvedValue(null);
+      usersRepository.findOneById.mockResolvedValue(null);
       const result = await service.findOneById(999);
-      expect(usersRepository.findOne).toHaveBeenCalledWith({ 
-        where: { id: 999 }, 
-        relations: ['userRoles', 'userRoles.role'] });
+      expect(usersRepository.findOneById).toHaveBeenCalledWith(999);
       expect(result).toBeNull();
     });
   });
@@ -184,20 +145,17 @@ describe('UsersService', () => {
 
       const createdUser = { id: 1, username: 'test', password: 'hashed-password' } as User;
 
-      usersRepository.create.mockReturnValue(createdUser);
-      usersRepository.save.mockResolvedValue(createdUser);
-      userRolesRepository.create.mockReturnValue({ userId: 1, roleId: 1 } as UserRole);
-      userRolesRepository.save.mockResolvedValue({} as UserRole);
+      usersRepository.create.mockResolvedValue(createdUser);
+      usersRepository.createUserRole.mockResolvedValue({ userId: 1, roleId: 1 } as UserRole);
 
       const result = await service.create(dto);
 
       expect(bcrypt.hash).toHaveBeenCalledWith('123456', 10);
-      expect(usersRepository.create).toHaveBeenCalled();
-      expect(usersRepository.save).toHaveBeenCalledWith(createdUser);
-      expect(userRolesRepository.create).toHaveBeenCalledWith({
-        userId: 1,
-        roleId: 1,
+      expect(usersRepository.create).toHaveBeenCalledWith({
+        username: 'test',
+        password: 'hashed-password',
       });
+      expect(usersRepository.createUserRole).toHaveBeenCalledWith(1, 1);
       expect(result).toEqual(createdUser);
     });
 
@@ -210,13 +168,11 @@ describe('UsersService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
       const createdUser = { id: 1 } as User;
-      usersRepository.create.mockReturnValue(createdUser);
-      usersRepository.save.mockResolvedValue(createdUser);
+      usersRepository.create.mockResolvedValue(createdUser);
 
       const result = await service.create(dto);
 
-      expect(userRolesRepository.create).not.toHaveBeenCalled();
-      expect(userRolesRepository.save).not.toHaveBeenCalled();
+      expect(usersRepository.createUserRole).not.toHaveBeenCalled();
       expect(result).toEqual(createdUser);
     });
 
@@ -241,10 +197,8 @@ describe('UsersService', () => {
         password: 'hashed-password',
       } as User;
 
-      usersRepository.create.mockReturnValue(createdUser);
-      usersRepository.save.mockResolvedValue(createdUser);
-      userRolesRepository.create.mockReturnValue({ userId: 2, roleId: 2 } as UserRole);
-      userRolesRepository.save.mockResolvedValue({} as UserRole);
+      usersRepository.create.mockResolvedValue(createdUser);
+      usersRepository.createUserRole.mockResolvedValue({ userId: 2, roleId: 2 } as UserRole);
 
       const result = await service.create(dto);
 
@@ -256,12 +210,7 @@ describe('UsersService', () => {
         username: 'johndoe',
         password: 'hashed-password',
       });
-      expect(usersRepository.save).toHaveBeenCalledWith(createdUser);
-      expect(userRolesRepository.create).toHaveBeenCalledWith({
-        userId: 2,
-        roleId: 2,
-      });
-      expect(userRolesRepository.save).toHaveBeenCalled();
+      expect(usersRepository.createUserRole).toHaveBeenCalledWith(2, 2);
       expect(result).toEqual(createdUser);
     });
 
@@ -275,18 +224,15 @@ describe('UsersService', () => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
       const createdUser = { id: 5, username: 'testuser' } as User;
-      const userRole = { userId: 5, roleId: 3 } as UserRole;
 
-      usersRepository.create.mockReturnValue(createdUser);
-      usersRepository.save.mockResolvedValue(createdUser);
-      userRolesRepository.create.mockReturnValue(userRole);
-      userRolesRepository.save.mockResolvedValue(userRole);
+      usersRepository.create.mockResolvedValue(createdUser);
+      usersRepository.createUserRole.mockResolvedValue({ userId: 5, roleId: 3 } as UserRole);
 
       const result = await service.create(dto);
 
-      const saveOrder = usersRepository.save.mock.invocationCallOrder[0];
-      const roleSaveOrder = userRolesRepository.save.mock.invocationCallOrder[0];
-      expect(saveOrder).toBeLessThan(roleSaveOrder);
+      const createOrder = usersRepository.create.mock.invocationCallOrder[0];
+      const roleCreateOrder = usersRepository.createUserRole.mock.invocationCallOrder[0];
+      expect(createOrder).toBeLessThan(roleCreateOrder);
       expect(result).toEqual(createdUser);
     });
   });
@@ -300,26 +246,23 @@ describe('UsersService', () => {
 
       const user = { id: 1 } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
+      usersRepository.findOneById.mockResolvedValue(user);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-new-pass');
-
-      userRolesRepository.findOne.mockResolvedValue({ id: 10, userId: 1 } as UserRole);
-
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.findUserRoleByUserId.mockResolvedValue({ id: 10, userId: 1 } as UserRole);
+      usersRepository.update.mockResolvedValue(undefined);
+      usersRepository.updateUserRole.mockResolvedValue(undefined);
 
       const result = await service.update(1, dto);
 
       expect(usersRepository.update).toHaveBeenCalledWith(1, {
         password: 'hashed-new-pass',
       });
-      expect(userRolesRepository.update).toHaveBeenCalledWith(10, {
-        roleId: 2,
-      });
+      expect(usersRepository.updateUserRole).toHaveBeenCalledWith(10, 2);
       expect(result).toEqual(user);
     });
 
     it('should return null if user not found', async () => {
-      jest.spyOn(service, 'findOneById').mockResolvedValue(null);
+      usersRepository.findOneById.mockResolvedValue(null);
 
       const result = await service.update(1, {} as UpdateUserDto);
 
@@ -335,9 +278,10 @@ describe('UsersService', () => {
 
       const user = { id: 1 } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
-      userRolesRepository.findOne.mockResolvedValue({ id: 10, userId: 1 } as UserRole);
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.findOneById.mockResolvedValue(user);
+      usersRepository.findUserRoleByUserId.mockResolvedValue({ id: 10, userId: 1 } as UserRole);
+      usersRepository.update.mockResolvedValue(undefined);
+      usersRepository.updateUserRole.mockResolvedValue(undefined);
 
       const result = await service.update(1, dto);
 
@@ -346,9 +290,7 @@ describe('UsersService', () => {
         firstName: 'Updated',
         email: 'updated@example.com',
       });
-      expect(userRolesRepository.update).toHaveBeenCalledWith(10, {
-        roleId: 2,
-      });
+      expect(usersRepository.updateUserRole).toHaveBeenCalledWith(10, 2);
       expect(result).toEqual(user);
     });
 
@@ -360,9 +302,9 @@ describe('UsersService', () => {
 
       const user = { id: 1 } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
+      usersRepository.findOneById.mockResolvedValue(user);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-new-pass');
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.update.mockResolvedValue(undefined);
 
       const result = await service.update(1, dto);
 
@@ -370,9 +312,9 @@ describe('UsersService', () => {
         password: 'hashed-new-pass',
         firstName: 'Updated',
       });
-      expect(userRolesRepository.findOne).not.toHaveBeenCalled();
-      expect(userRolesRepository.create).not.toHaveBeenCalled();
-      expect(userRolesRepository.update).not.toHaveBeenCalled();
+      expect(usersRepository.findUserRoleByUserId).not.toHaveBeenCalled();
+      expect(usersRepository.createUserRole).not.toHaveBeenCalled();
+      expect(usersRepository.updateUserRole).not.toHaveBeenCalled();
       expect(result).toEqual(user);
     });
 
@@ -382,23 +324,17 @@ describe('UsersService', () => {
       } as any;
 
       const user = { id: 1 } as User;
-      const newUserRole = { id: 20, userId: 1, roleId: 3 } as UserRole;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
-      userRolesRepository.findOne.mockResolvedValue(null);
-      userRolesRepository.create.mockReturnValue(newUserRole);
-      userRolesRepository.save.mockResolvedValue(newUserRole);
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.findOneById.mockResolvedValue(user);
+      usersRepository.findUserRoleByUserId.mockResolvedValue(null);
+      usersRepository.createUserRole.mockResolvedValue({ id: 20, userId: 1, roleId: 3 } as UserRole);
+      usersRepository.update.mockResolvedValue(undefined);
 
       const result = await service.update(1, dto);
 
-      expect(userRolesRepository.findOne).toHaveBeenCalledWith({ where: { userId: 1 } });
-      expect(userRolesRepository.create).toHaveBeenCalledWith({
-        userId: 1,
-        roleId: 3,
-      });
-      expect(userRolesRepository.save).toHaveBeenCalledWith(newUserRole);
-      expect(userRolesRepository.update).not.toHaveBeenCalled();
+      expect(usersRepository.findUserRoleByUserId).toHaveBeenCalledWith(1);
+      expect(usersRepository.createUserRole).toHaveBeenCalledWith(1, 3);
+      expect(usersRepository.updateUserRole).not.toHaveBeenCalled();
       expect(result).toEqual(user);
     });
 
@@ -409,9 +345,9 @@ describe('UsersService', () => {
 
       const user = { id: 1 } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
+      usersRepository.findOneById.mockResolvedValue(user);
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.update.mockResolvedValue(undefined);
 
       const result = await service.update(1, dto);
 
@@ -419,7 +355,7 @@ describe('UsersService', () => {
       expect(usersRepository.update).toHaveBeenCalledWith(1, {
         password: 'hashed-password',
       });
-      expect(userRolesRepository.findOne).not.toHaveBeenCalled();
+      expect(usersRepository.findUserRoleByUserId).not.toHaveBeenCalled();
       expect(result).toEqual(user);
     });
 
@@ -430,17 +366,16 @@ describe('UsersService', () => {
 
       const user = { id: 1 } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
-      userRolesRepository.findOne.mockResolvedValue({ id: 15, userId: 1 } as UserRole);
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.findOneById.mockResolvedValue(user);
+      usersRepository.findUserRoleByUserId.mockResolvedValue({ id: 15, userId: 1 } as UserRole);
+      usersRepository.update.mockResolvedValue(undefined);
+      usersRepository.updateUserRole.mockResolvedValue(undefined);
 
       const result = await service.update(1, dto);
 
       expect(bcrypt.hash).not.toHaveBeenCalled();
       expect(usersRepository.update).toHaveBeenCalledWith(1, {});
-      expect(userRolesRepository.update).toHaveBeenCalledWith(15, {
-        roleId: 5,
-      });
+      expect(usersRepository.updateUserRole).toHaveBeenCalledWith(15, 5);
       expect(result).toEqual(user);
     });
 
@@ -454,8 +389,8 @@ describe('UsersService', () => {
 
       const user = { id: 2 } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.findOneById.mockResolvedValue(user);
+      usersRepository.update.mockResolvedValue(undefined);
 
       const result = await service.update(2, dto);
 
@@ -466,7 +401,7 @@ describe('UsersService', () => {
         email: 'jane.smith@example.com',
         username: 'janesmith',
       });
-      expect(userRolesRepository.findOne).not.toHaveBeenCalled();
+      expect(usersRepository.findUserRoleByUserId).not.toHaveBeenCalled();
       expect(result).toEqual(user);
     });
 
@@ -474,14 +409,14 @@ describe('UsersService', () => {
       const dto: UpdateUserDto = {} as any;
       const user = { id: 3 } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.findOneById.mockResolvedValue(user);
+      usersRepository.update.mockResolvedValue(undefined);
 
       const result = await service.update(3, dto);
 
       expect(bcrypt.hash).not.toHaveBeenCalled();
       expect(usersRepository.update).toHaveBeenCalledWith(3, {});
-      expect(userRolesRepository.findOne).not.toHaveBeenCalled();
+      expect(usersRepository.findUserRoleByUserId).not.toHaveBeenCalled();
       expect(result).toEqual(user);
     });
 
@@ -492,45 +427,51 @@ describe('UsersService', () => {
 
       const user = { id: 1, firstName: 'Updated' } as User;
 
-      jest.spyOn(service, 'findOneById').mockResolvedValue(user);
-      jest.spyOn(service, 'findOneById').mockResolvedValueOnce(user).mockResolvedValueOnce(user);
+      usersRepository.findOneById.mockResolvedValue(user);
+      usersRepository.update.mockResolvedValue(undefined);
 
       const result = await service.update(1, dto);
 
-      expect(service.findOneById).toHaveBeenCalledTimes(2);
-      expect(service.findOneById).toHaveBeenNthCalledWith(1, 1);
-      expect(service.findOneById).toHaveBeenNthCalledWith(2, 1);
+      expect(usersRepository.findOneById).toHaveBeenCalledTimes(2);
+      expect(usersRepository.findOneById).toHaveBeenNthCalledWith(1, 1);
+      expect(usersRepository.findOneById).toHaveBeenNthCalledWith(2, 1);
       expect(result).toEqual(user);
     });
   });
 
   describe('remove', () => {
     it('should delete user and roles', async () => {
+      usersRepository.softDeleteUserRoles.mockResolvedValue(undefined);
+      usersRepository.softDelete.mockResolvedValue(undefined);
+
       await service.remove(1);
 
-      expect(userRolesRepository.delete).toHaveBeenCalledWith({ userId: 1 });
-      expect(usersRepository.delete).toHaveBeenCalledWith(1);
+      expect(usersRepository.softDeleteUserRoles).toHaveBeenCalledWith(1);
+      expect(usersRepository.softDelete).toHaveBeenCalledWith(1);
     });
 
     it('should delete roles before deleting user', async () => {
+      usersRepository.softDeleteUserRoles.mockResolvedValue(undefined);
+      usersRepository.softDelete.mockResolvedValue(undefined);
+
       await service.remove(42);
 
-      expect(userRolesRepository.delete).toHaveBeenCalledWith({ userId: 42 });
-      expect(usersRepository.delete).toHaveBeenCalledWith(42);
+      expect(usersRepository.softDeleteUserRoles).toHaveBeenCalledWith(42);
+      expect(usersRepository.softDelete).toHaveBeenCalledWith(42);
       
-      const rolesDeleteOrder = userRolesRepository.delete.mock.invocationCallOrder[0];
-      const userDeleteOrder = usersRepository.delete.mock.invocationCallOrder[0];
+      const rolesDeleteOrder = usersRepository.softDeleteUserRoles.mock.invocationCallOrder[0];
+      const userDeleteOrder = usersRepository.softDelete.mock.invocationCallOrder[0];
       expect(rolesDeleteOrder).toBeLessThan(userDeleteOrder);
     });
 
     it('should handle deletion of non-existent user', async () => {
-      userRolesRepository.delete.mockResolvedValue({ affected: 0 } as DeleteResult);
-      usersRepository.delete.mockResolvedValue({ affected: 0 } as DeleteResult);
+      usersRepository.softDeleteUserRoles.mockResolvedValue(undefined);
+      usersRepository.softDelete.mockResolvedValue(undefined);
 
       await service.remove(999);
 
-      expect(userRolesRepository.delete).toHaveBeenCalledWith({ userId: 999 });
-      expect(usersRepository.delete).toHaveBeenCalledWith(999);
+      expect(usersRepository.softDeleteUserRoles).toHaveBeenCalledWith(999);
+      expect(usersRepository.softDelete).toHaveBeenCalledWith(999);
     });
   });
 
