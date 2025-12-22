@@ -33,15 +33,36 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status = exception.getStatus();
       const exceptionResponse = exception.getResponse();
       
-      if (typeof exceptionResponse === 'string') {
-        message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      // Asignar mensaje basado en constantes segun el codigo de estado
+      switch (status) {
+        case HttpStatus.BAD_REQUEST:
+          message = ERROR_MESSAGES.BAD_REQUEST;
+          break;
+        case HttpStatus.UNAUTHORIZED:
+          message = ERROR_MESSAGES.UNAUTHORIZED;
+          break;
+        case HttpStatus.FORBIDDEN:
+          message = ERROR_MESSAGES.FORBIDDEN;
+          break;
+        case HttpStatus.NOT_FOUND:
+          message = ERROR_MESSAGES.NOT_FOUND;
+          break;
+        case HttpStatus.INTERNAL_SERVER_ERROR:
+          message = ERROR_MESSAGES.INTERNAL_SERVER_ERROR;
+          break;
+      }
+
+      // Si es un error de validacion (array), usamos la constante especifica
+      if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
         const responseObj = exceptionResponse as any;
-        message = responseObj.message || responseObj.error || message;
-        
-        // Si message es un array (validacion), unir los mensajes
-        if (Array.isArray(message)) {
-          message = message.join(', ');
+        if (Array.isArray(responseObj.message)) {
+          //message = ERROR_MESSAGES.VALIDATION_ERROR;
+          message = `${ERROR_MESSAGES.VALIDATION_ERROR}: ${responseObj.message.join(', ')}`;
+        } else if (responseObj.message && typeof responseObj.message === 'string' && !Object.values(ERROR_MESSAGES).includes(message as any)) {
+
+             if (![400, 401, 403, 404, 500].includes(status)) {
+                 message = responseObj.message;
+             }
         }
       }
       

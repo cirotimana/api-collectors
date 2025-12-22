@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Public } from '../auth/public.decorator';
+import { PAGINATION } from '../../common/constants/constants';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -25,8 +26,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users.' })
   findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page: number = PAGINATION.DEFAULT_PAGE,
+    @Query('limit') limit: number = PAGINATION.DEFAULT_LIMIT,
   ) {
     return this.usersService.findAll(page, limit);
   }

@@ -1,8 +1,8 @@
 /**
- * Constantes centralizadas de la aplicación
+ * Constantes centralizadas de la aplicacion
  */
 
-// Códigos de estado HTTP
+// Codigos de estado HTTP
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -16,31 +16,31 @@ export const HTTP_STATUS = {
 // Mensajes de error comunes
 export const ERROR_MESSAGES = {
   INTERNAL_SERVER_ERROR: 'Error interno del servidor',
-  BAD_REQUEST: 'Solicitud inválida',
+  BAD_REQUEST: 'Solicitud invalida',
   UNAUTHORIZED: 'No autorizado',
   FORBIDDEN: 'Acceso prohibido',
   NOT_FOUND: 'Recurso no encontrado',
-  VALIDATION_ERROR: 'Error de validación',
+  VALIDATION_ERROR: 'Error de validacion',
   DATABASE_ERROR: 'Error de base de datos',
 } as const;
 
-// Mensajes de éxito comunes
+// Mensajes de exito comunes
 export const SUCCESS_MESSAGES = {
-  OPERATION_SUCCESSFUL: 'Operación exitosa',
+  OPERATION_SUCCESSFUL: 'Operacion exitosa',
   CREATED_SUCCESSFULLY: 'Creado exitosamente',
   UPDATED_SUCCESSFULLY: 'Actualizado exitosamente',
   DELETED_SUCCESSFULLY: 'Eliminado exitosamente',
   RETRIEVED_SUCCESSFULLY: 'Datos obtenidos exitosamente',
 } as const;
 
-// Configuración de paginación
+// Configuracion de paginacion
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
   DEFAULT_LIMIT: 50,
   MAX_LIMIT: 100,
 } as const;
 
-// Configuración de timeouts (en milisegundos)
+// Configuracion de timeouts (en milisegundos)
 export const TIMEOUTS = {
   DATABASE_QUERY: 30000, // 30 segundos
   API_REQUEST: 60000, // 60 segundos
@@ -54,7 +54,7 @@ export const DATE_FORMATS = {
   TIME_ONLY: 'HH:mm:ss',
 } as const;
 
-// Configuración de Pool de Conexiones
+// Configuracion de Pool de Conexiones
 export const DATABASE_POOL = {
   MIN_CONNECTIONS: 5,
   MAX_CONNECTIONS: 20,

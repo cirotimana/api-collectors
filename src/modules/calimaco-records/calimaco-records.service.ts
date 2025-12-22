@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CalimacoRecord } from '../../entities/calimaco-record.entity';
 import { CreateCalimacoRecordDto } from './dto/create-calimaco-record.dto';
 import { UpdateCalimacoRecordDto } from './dto/update-calimaco-record.dto';
+import { PAGINATION } from '../../common/constants/constants';
 
 @Injectable()
 export class CalimacoRecordsService {
@@ -72,8 +73,8 @@ export class CalimacoRecordsService {
 
   async findByStatus(
     status: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
     collectorId?: number,
     fromDate?: string,
     toDate?: string,
@@ -117,8 +118,8 @@ export class CalimacoRecordsService {
     collectorId?: number,
     fromDate?: string,
     toDate?: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
     status?: string,
   ) {
     const queryBuilder = this.calimacoRecordRepository

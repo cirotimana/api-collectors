@@ -4,6 +4,7 @@ import { ConciliationReportDto } from './dto/conciliation-report.dto';
 import { SalesReportDto } from './dto/sales-report.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PAGINATION } from '../../common/constants/constants';
 
 @ApiTags('Conciliation Reports')
 @ApiBearerAuth()
@@ -28,8 +29,8 @@ export class ConciliationReportsController {
       ids,
       fromDate,
       toDate,
-      page ? +page : 1,
-      limit ? +limit : 50,
+      page ? +page : PAGINATION.DEFAULT_PAGE,
+      limit ? +limit : PAGINATION.DEFAULT_LIMIT,
     );
   }
 
@@ -48,8 +49,8 @@ export class ConciliationReportsController {
       ids,
       fromDate,
       toDate,
-      page ? +page : 1,
-      limit ? +limit : 50,
+      page ? +page : PAGINATION.DEFAULT_PAGE,
+      limit ? +limit : PAGINATION.DEFAULT_LIMIT,
     );
   }
 
@@ -68,8 +69,8 @@ export class ConciliationReportsController {
       ids,
       fromDate,
       toDate,
-      page ? +page : 1,
-      limit ? +limit : 50,
+      page ? +page : PAGINATION.DEFAULT_PAGE,
+      limit ? +limit : PAGINATION.DEFAULT_LIMIT,
     );
   }
 
@@ -88,8 +89,8 @@ export class ConciliationReportsController {
       ids,
       fromDate,
       toDate,
-      page ? +page : 1,
-      limit ? +limit : 50,
+      page ? +page : PAGINATION.DEFAULT_PAGE,
+      limit ? +limit : PAGINATION.DEFAULT_LIMIT,
     );
   }
 

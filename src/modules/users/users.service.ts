@@ -4,6 +4,7 @@ import { Repository, IsNull } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PAGINATION } from '../../common/constants/constants';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from '../../entities/user-role.entity';
 
@@ -38,7 +39,7 @@ export class UsersService {
     return savedUser;
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<{ data: User[]; total: number }> {
+  async findAll(page: number = PAGINATION.DEFAULT_PAGE, limit: number = PAGINATION.DEFAULT_LIMIT): Promise<{ data: User[]; total: number }> {
     const [data, total] = await this.usersRepository.findAndCount({
       where: { deletedAt: IsNull() },
       skip: (page - 1) * limit,

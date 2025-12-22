@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CalimacoRecord } from '../../entities/calimaco-record.entity';
+import { PAGINATION } from '../../common/constants/constants';
 
 @Injectable()
 export class ConciliationReportsService {
@@ -16,8 +17,8 @@ export class ConciliationReportsService {
     collectorIds: number[],
     fromDate: string,
     toDate: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
   ) {
     // Ajustar fechas para incluir todo el día si no tienen hora
     const adjustedFromDate = fromDate.includes(':') ? fromDate : `${fromDate} 00:00:00`;
@@ -62,8 +63,8 @@ export class ConciliationReportsService {
     collectorIds: number[],
     fromDate: string,
     toDate: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
   ) {
     // Ajustar fechas para incluir todo el día si no tienen hora
     const adjustedFromDate = fromDate.includes(':') ? fromDate : `${fromDate} 00:00:00`;
@@ -109,8 +110,8 @@ export class ConciliationReportsService {
     collectorIds: number[],
     fromDate: string,
     toDate: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
   ) {
     // Ajustar fechas para incluir todo el día si no tienen hora
     const adjustedFromDate = fromDate.includes(':') ? fromDate : `${fromDate} 00:00:00`;
@@ -156,8 +157,8 @@ export class ConciliationReportsService {
     collectorIds?: number[],
     fromDate?: string,
     toDate?: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
   ) {
     // preparar parametros - usar defaults de la funcion si estan vacios
     const params: any[] = [];
