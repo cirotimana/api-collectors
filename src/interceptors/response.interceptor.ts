@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ResponseDto } from '../common/dto/response.dto';
 import { FastifyRequest } from 'fastify';
+import { SUCCESS_MESSAGES } from '../common/constants/constants';
 
 /**
  * Interceptor para estandarizar las respuestas exitosas
@@ -46,7 +47,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, ResponseDto<T>
         }
 
         const responseDto = ResponseDto.success(
-          'Operación exitosa',
+          SUCCESS_MESSAGES.OPERATION_SUCCESSFUL,
           responsePayload,
           request.url,
           statusCode,

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CollectorRecord } from '../../entities/collector-record.entity';
 import { CreateCollectorRecordDto } from './dto/create-collector-record.dto';
 import { UpdateCollectorRecordDto } from './dto/update-collector-record.dto';
+import { PAGINATION } from '../../common/constants/constants';
 
 @Injectable()
 export class CollectorRecordsService {
@@ -72,8 +73,8 @@ export class CollectorRecordsService {
 
   async findByProviderStatus(
     providerStatus: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
     collectorId?: number,
     fromDate?: string,
     toDate?: string,
@@ -117,8 +118,8 @@ export class CollectorRecordsService {
     collectorId?: number,
     fromDate?: string,
     toDate?: string,
-    page: number = 1,
-    limit: number = 50,
+    page: number = PAGINATION.DEFAULT_PAGE,
+    limit: number = PAGINATION.DEFAULT_LIMIT,
     providerStatus?: string,
   ) {
     const queryBuilder = this.collectorRecordRepository

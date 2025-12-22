@@ -4,6 +4,7 @@ import { UsersService } from './service/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { PAGINATION } from 'src/common/constants/constants';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -108,7 +109,7 @@ describe('UsersController', () => {
 
       const result = await controller.findAll();
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10);
+      expect(service.findAll).toHaveBeenCalledWith(PAGINATION.DEFAULT_PAGE, PAGINATION.DEFAULT_LIMIT);
       expect(service.findAll).toHaveBeenCalledTimes(1);
       expect(result).toEqual(expectedResult);
     });
@@ -147,7 +148,7 @@ describe('UsersController', () => {
 
       const result = await controller.findAll(undefined, 10);
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10);
+      expect(service.findAll).toHaveBeenCalledWith(PAGINATION.DEFAULT_PAGE, 10);
       expect(result).toEqual(expectedResult);
     });
 
@@ -159,7 +160,7 @@ describe('UsersController', () => {
 
       const result = await controller.findAll(1, undefined);
 
-      expect(service.findAll).toHaveBeenCalledWith(1, 10);
+      expect(service.findAll).toHaveBeenCalledWith(1, PAGINATION.DEFAULT_LIMIT);
       expect(result).toEqual(expectedResult);
     });
   });
