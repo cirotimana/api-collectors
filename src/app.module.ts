@@ -8,13 +8,13 @@ import { CalimacoRecordsModule } from './calimaco-records/calimaco-records.modul
 import { CollectorRecordsModule } from './collector-records/collector-records.module';
 import { ConciliationReportsModule } from './conciliation-reports/conciliation-reports.module';
 import { CollectorsModule } from './collectors/collectors.module';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
 
 // Entities
 import { Collector } from './entities/collector.entity';
-import { User } from './entities/user.entity';
+import { User } from './modules/users/entities/user.entity';
 import { Conciliation } from './entities/conciliation.entity';
 import { ConciliationFile } from './entities/conciliation-file.entity';
 import { Liquidation } from './entities/liquidation.entity';

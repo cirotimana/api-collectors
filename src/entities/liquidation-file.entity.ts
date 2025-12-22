@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { Liquidation } from './liquidation.entity';
-import { User } from './user.entity';
+import { User } from '../modules/users/entities/user.entity';
 
 @Entity('liquidation_files')
 export class LiquidationFile {

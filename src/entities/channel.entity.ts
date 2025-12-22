@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../modules/users/entities/user.entity';
 
 @Entity('channels')
 export class Channel {
