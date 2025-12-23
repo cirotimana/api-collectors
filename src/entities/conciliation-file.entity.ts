@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { Conciliation } from './conciliation.entity';
-import { User } from './user.entity';
+import { User } from '../modules/users/entities/user.entity';
 
 @Entity('conciliation_files')
 export class ConciliationFile {

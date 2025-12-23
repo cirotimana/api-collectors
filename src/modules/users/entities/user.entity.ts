@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
-import { Conciliation } from './conciliation.entity';
-import { Liquidation } from './liquidation.entity';
-import { Channel } from './channel.entity';
-import { UserRole } from './user-role.entity';
+import { Conciliation } from '../../../entities/conciliation.entity';
+import { Liquidation } from '../../../entities/liquidation.entity';
+import { Channel } from '../../../entities/channel.entity';
+import { UserRole } from '../../../entities/user-role.entity';
 
 @Entity('users')
 export class User {
