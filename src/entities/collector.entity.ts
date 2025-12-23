@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { Conciliation } from './conciliation.entity';
 import { Liquidation } from './liquidation.entity';
-import { User } from './user.entity';
+import { User } from '../modules/users/entities/user.entity';
 
 @Entity('collectors')
 export class Collector {
