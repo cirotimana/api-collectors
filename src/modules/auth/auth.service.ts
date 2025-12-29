@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { UsersService } from '../users/service/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,5 +44,38 @@ export class AuthService {
         role: role,
       },
     };
+  }
+
+  async getCurrentUser(userId: number): Promise<UserResponseDto> {
+    // Fetch user from database to get fresh data
+    const user = await this.usersService.findOneById(userId);
+
+    // User not found (deleted)
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    // User is inactive
+    if (!user.isActive) {
+      throw new ForbiddenException('Usuario inactivo');
+    }
+
+    // Extract role from userRoles relation
+    const role = user.userRoles && user.userRoles.length > 0 
+      ? user.userRoles[0].role.name 
+      : undefined;
+
+    // Build response DTO
+    const response: UserResponseDto = {
+      id: user.id,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: role,
+      isActive: user.isActive,
+    };
+
+    return response;
   }
 }
