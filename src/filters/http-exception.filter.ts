@@ -79,6 +79,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
         parameters: exception.parameters,
         driverError: exception.driverError,
       });
+
+      // Manejo especifico para duplicados (Postgres code 23505)
+      if (exception.driverError?.code === '23505') {
+        const detail = exception.driverError.detail || '';
+        message = ERROR_MESSAGES.DUPLICATE_ENTRY;
+        
+        // Opcional: agregar detalle al mensaje si es necesario, pero por el momento no 
+        //if (detail) message += `: ${detail}`;
+      }
     } else if (exception instanceof Error) {
       message = exception.message || message;
       stack = exception.stack;
