@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Request } from '@nestjs/common';
 import { UsersService } from './service/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -49,7 +49,7 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user' })
   @ApiResponse({ status: 200, description: 'The user has been successfully deleted.' })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id') id: string, @Request() req) {
+    return this.usersService.remove(+id, req.user.userId);
   }
 }

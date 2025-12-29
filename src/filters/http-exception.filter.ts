@@ -58,11 +58,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
         if (Array.isArray(responseObj.message)) {
           //message = ERROR_MESSAGES.VALIDATION_ERROR;
           message = `${ERROR_MESSAGES.VALIDATION_ERROR}: ${responseObj.message.join(', ')}`;
-        } else if (responseObj.message && typeof responseObj.message === 'string' && !Object.values(ERROR_MESSAGES).includes(message as any)) {
-
-             if (![400, 401, 403, 404, 500].includes(status)) {
-                 message = responseObj.message;
-             }
+        } else if (responseObj.message && typeof responseObj.message === 'string') {
+          // si el mensaje es diferente al mensaje por defecto del status code (ej. "Bad Request")
+          // o es uno de nuestros mensajes personalizados, lo respetamos
+          const isDefaultMessage = Object.values(ERROR_MESSAGES).includes(message as any);
+          const isCustomMessage = Object.values(ERROR_MESSAGES).includes(responseObj.message as any);
+          
+          if (!isDefaultMessage || isCustomMessage || responseObj.message !== 'Bad Request') {
+            message = responseObj.message;
+          }
         }
       }
       
