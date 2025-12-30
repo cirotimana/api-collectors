@@ -1,4 +1,5 @@
-import { IsOptional, IsNumber, IsString, IsDateString } from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsDate } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateCollectorRecordDto {
   @IsOptional()
@@ -6,8 +7,9 @@ export class UpdateCollectorRecordDto {
   collectorId?: number;
 
   @IsOptional()
-  @IsDateString()
-  recordDate?: string;
+  @IsDate()
+  @Type(() => Date)
+  recordDate?: Date;
 
   @IsOptional()
   @IsString()

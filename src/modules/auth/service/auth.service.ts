@@ -1,13 +1,8 @@
-<<<<<<< HEAD:src/modules/auth/auth.service.ts
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { UsersService } from '../users/service/users.service';
-=======
-import { Injectable } from '@nestjs/common';
 import { UsersService } from '../../users/service/users.service';
->>>>>>> 841ef79805c1aeb7a976983b8595cdf4ca602c1d:src/modules/auth/service/auth.service.ts
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserResponseDto } from './dto/user-response.dto';
+import { UserResponseDto } from '../../users/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {

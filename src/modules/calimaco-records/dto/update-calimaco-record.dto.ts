@@ -1,4 +1,5 @@
-import { IsOptional, IsNumber, IsString, IsDateString } from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsDate } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdateCalimacoRecordDto {
   @IsOptional()
@@ -14,12 +15,14 @@ export class UpdateCalimacoRecordDto {
   calimacoIdNormalized?: string;
 
   @IsOptional()
-  @IsDateString()
-  recordDate?: string;
+  @IsDate()
+  @Type(() => Date)
+  recordDate?: Date;
 
   @IsOptional()
-  @IsDateString()
-  modificationDate?: string;
+  @IsDate()
+  @Type(() => Date)
+  modificationDate?: Date;
 
   @IsOptional()
   @IsString()

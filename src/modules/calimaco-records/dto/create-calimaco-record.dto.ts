@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional, IsDate } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateCalimacoRecordDto {
   @IsNotEmpty()
@@ -14,12 +15,14 @@ export class CreateCalimacoRecordDto {
   calimacoIdNormalized?: string;
 
   @IsNotEmpty()
-  @IsDateString()
-  recordDate: string;
+  @IsDate()
+  @Type(() => Date)
+  recordDate: Date;
 
   @IsOptional()
-  @IsDateString()
-  modificationDate?: string;
+  @IsDate()
+  @Type(() => Date)
+  modificationDate?: Date;
 
   @IsNotEmpty()
   @IsString()
