@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { LiquidationsService } from './liquidations.service';
+import { LiquidationsService } from './service/liquidations.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
