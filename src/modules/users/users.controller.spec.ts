@@ -4,7 +4,7 @@ import { UsersService } from './service/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { PAGINATION } from 'src/common/constants/constants';
+import { PAGINATION } from '../../common/constants/constants';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -325,7 +325,7 @@ describe('UsersController', () => {
 
       service.remove.mockResolvedValue(undefined);
 
-      const result = await controller.remove(userId);
+      const result = await controller.remove(userId, 1);
 
       expect(service.remove).toHaveBeenCalledWith(1);
       expect(service.remove).toHaveBeenCalledTimes(1);
@@ -337,7 +337,7 @@ describe('UsersController', () => {
 
       service.remove.mockResolvedValue(undefined);
 
-      const result = await controller.remove(userId);
+      const result = await controller.remove(userId, 42);
 
       expect(service.remove).toHaveBeenCalledWith(42);
       expect(result).toBeUndefined();

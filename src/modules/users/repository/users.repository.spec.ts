@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { UsersRepository } from './users.repository';
 import { User } from '../entities/user.entity';
-import { UserRole } from '../../../entities/user-role.entity';
+import { UserRole } from '../../roles/entities/user-role.entity';
 
 describe('UsersRepository', () => {
   let repository: UsersRepository;
