@@ -1,5 +1,5 @@
 import { Controller, Request, Post, UseGuards, Body, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './service/auth.service';
 import { Public } from './public.decorator';
 import { LoginDto } from './dto/login.dto';
 import { ApiTags, ApiBody } from '@nestjs/swagger';

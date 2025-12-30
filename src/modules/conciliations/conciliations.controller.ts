@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ConciliationsService } from './conciliations.service';
+import { ConciliationsService } from './service/conciliations.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 

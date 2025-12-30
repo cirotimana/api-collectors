@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Delete, Patch, Body, UseGuards } from '@nestjs/common';
-import { ReconciliationDiscrepanciesService } from './reconciliation-discrepancies.service';
+import { ReconciliationDiscrepanciesService } from './service/reconciliation-discrepancies.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
