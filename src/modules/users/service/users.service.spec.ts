@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { User } from '../entities/user.entity';
-import { UserRole } from '../../../entities/user-role.entity';
+import { UserRole } from '../../roles/entities/user-role.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';

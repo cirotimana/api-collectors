@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from '../repository/users.repository';
-import { PAGINATION } from '../../../common/constants/constants';
+import { PAGINATION, ERROR_MESSAGES } from '../../../common/constants/constants';
 
 @Injectable()
 export class UsersService {
@@ -62,7 +62,11 @@ export class UsersService {
     return this.findOneById(id);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number, currentUserId?: number): Promise<void> {
+    if (currentUserId && id === currentUserId) {
+      throw new BadRequestException(ERROR_MESSAGES.SELF_DELETION);
+    }
+    
     await this.usersRepository.softDeleteUserRoles(id);
     await this.usersRepository.softDelete(id);
   }

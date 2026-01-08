@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional, IsDate } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateCollectorRecordDto {
   @IsNotEmpty()
@@ -6,8 +7,9 @@ export class CreateCollectorRecordDto {
   collectorId: number;
 
   @IsNotEmpty()
-  @IsDateString()
-  recordDate: string;
+  @IsDate()
+  @Type(() => Date)
+  recordDate: Date;
 
   @IsNotEmpty()
   @IsString()

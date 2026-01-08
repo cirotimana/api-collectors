@@ -22,6 +22,8 @@ export const ERROR_MESSAGES = {
   NOT_FOUND: 'Recurso no encontrado',
   VALIDATION_ERROR: 'Error de validacion',
   DATABASE_ERROR: 'Error de base de datos',
+  DUPLICATE_ENTRY: 'El registro ya existe. Por favor verifique los datos enviados (usuario o correo duplicado)',
+  SELF_DELETION: 'No puedes eliminar tu propia cuenta de usuario',
 } as const;
 
 // Mensajes de exito comunes
